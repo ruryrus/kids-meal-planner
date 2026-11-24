@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""아이들 식단표 PWA 아이콘 생성기 (Pillow 전용, 외부 이미지/AI 미사용).
+"""찬솔나 맘마 PWA 아이콘 생성기 (Pillow 전용, 외부 이미지/AI 미사용).
 
 만들어지는 파일
   icons/icon-192.png          일반 런처 아이콘 (둥근 모서리, 투명 바깥)

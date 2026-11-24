@@ -1,4 +1,4 @@
-/* 아이들 식단표 — 앱 로직 (외부 라이브러리 없음) */
+/* 찬솔나 맘마 — 앱 로직 (외부 라이브러리 없음) */
 (() => {
   'use strict';
 
@@ -149,7 +149,7 @@
     const isToday = day.date === todayISO();
     el.heroBadge.textContent = isToday ? '오늘' : '지난 식단';
     el.heroMeta.textContent = isToday
-      ? '오늘의 아이들 식단'
+      ? '오늘의 찬솔나 맘마'
       : (day === state.data.days[0] ? '오늘 식단은 아침 7:51에 올라와요' : '지난 식단 다시 보기');
     el.heroDate.textContent = longLabel(day.date, day.weekday);
     el.heroNote.textContent = day.note || '';

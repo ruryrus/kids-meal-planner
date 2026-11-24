@@ -1,9 +1,9 @@
-/* 아이들 식단표 서비스 워커
+/* 찬솔나 맘마 서비스 워커
  * - 앱 껍데기(HTML/CSS/JS/아이콘): 캐시 우선 + 뒤에서 갱신
  * - data/menus.json: 네트워크 우선(최신 식단이 먼저) + 실패하면 캐시
  * 모든 경로는 상대경로라 https://<user>.github.io/<repo>/ 어디에 올려도 동작합니다.
  */
-const VERSION = 'v8';
+const VERSION = 'v9';
 const SHELL_CACHE = 'kids-meal-shell-' + VERSION;
 const DATA_CACHE = 'kids-meal-data-' + VERSION;
 
