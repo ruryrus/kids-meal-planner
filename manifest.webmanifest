@@ -1,0 +1,35 @@
+{
+  "name": "아이들 식단표",
+  "short_name": "아이들 식단",
+  "description": "아이들과 함께 먹는 아침·저녁 식단과 레시피를 날짜별로 쌓아 두는 식단표",
+  "lang": "ko",
+  "dir": "ltr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait",
+  "theme_color": "#E4693F",
+  "background_color": "#FFF8F0",
+  "categories": ["food", "lifestyle", "health"],
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

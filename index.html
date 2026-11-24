@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>아이들 식단표</title>
+<meta name="description" content="아이들과 함께 먹는 아침·저녁 식단과 레시피를 매일 쌓아 두는 식단표">
+<meta name="theme-color" content="#E4693F">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="아이들 식단">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/favicon-64.png" sizes="64x64" type="image/png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app">
+
+  <header class="topbar">
+    <div class="topbar__row">
+      <div class="brand">
+        <img class="brand__icon" src="icons/icon-192.png" alt="" width="34" height="34">
+        <div class="brand__text">
+          <h1>아이들 식단표</h1>
+          <p>아침 ①·② · 저녁 ①·②</p>
+        </div>
+      </div>
+      <button class="iconbutton" id="installBtn" type="button" hidden>설치</button>
+    </div>
+
+    <div class="search">
+      <span class="search__icon" aria-hidden="true">🔍</span>
+      <input id="searchInput" type="search" inputmode="search" autocomplete="off"
+             placeholder="재료·메뉴 검색 (예: 닭, 새우, 국수)" aria-label="재료나 메뉴 검색">
+      <button class="search__clear" id="searchClear" type="button" aria-label="검색어 지우기" hidden>✕</button>
+    </div>
+  </header>
+
+  <main id="main">
+
+    <section class="hero" id="hero" aria-live="polite">
+      <div class="hero__top">
+        <span class="hero__badge" id="heroBadge">오늘</span>
+        <span class="hero__meta" id="heroMeta"></span>
+      </div>
+      <h2 class="hero__date" id="heroDate">불러오는 중…</h2>
+      <p class="hero__note" id="heroNote"></p>
+    </section>
+
+    <nav class="dates" id="dateBar" aria-label="날짜 선택"></nav>
+
+    <div class="viewbar">
+      <button class="chipbtn" id="allBtn" type="button" aria-pressed="false">지난 식단 전체</button>
+      <span class="updated" id="updatedAt"></span>
+    </div>
+
+    <section id="content" class="content" aria-live="polite">
+      <div class="skeleton" aria-hidden="true">
+        <div class="sk sk--card"></div><div class="sk sk--card"></div><div class="sk sk--card"></div>
+      </div>
+    </section>
+
+    <p class="footnote">매일 아침 7시 51분 브리핑에서 새 식단이 추가돼요.</p>
+  </main>
+</div>
+
+<!-- 상세 보기 (바텀시트) -->
+<div class="sheet" id="sheet" hidden>
+  <div class="sheet__backdrop" data-close="1"></div>
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+    <div class="sheet__grab" aria-hidden="true"></div>
+    <div class="sheet__head">
+      <div>
+        <p class="sheet__crumb" id="sheetCrumb"></p>
+        <h3 class="sheet__title" id="sheetTitle"></h3>
+      </div>
+      <button class="sheet__close" type="button" data-close="1" aria-label="닫기">✕</button>
+    </div>
+    <div class="sheet__body" id="sheetBody"></div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
