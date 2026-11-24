@@ -597,6 +597,16 @@
 
   /* ---------------- 서비스 워커 ---------------- */
   if ('serviceWorker' in navigator) {
+    // 새 버전 서비스워커가 제어를 가져오면(설치된 앱을 다시 열었을 때 등) 한 번만 새로 고쳐
+    // 최신 화면이 바로 보이게 한다. 처음 설치할 때는 새로 고치지 않는다.
+    const hadController = !!navigator.serviceWorker.controller;
+    let reloading = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!hadController || reloading) return;
+      reloading = true;
+      window.location.reload();
+    });
+
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('sw.js').catch(() => { /* 오프라인 미지원 환경 */ });
     });
