@@ -32,6 +32,7 @@
     data: null,
     selected: null,
     all: false,
+    month: null,          // 달력에 보여 줄 달 { y, m } (m은 1~12)
     query: '',
     checks: loadChecks(),
     offline: false
@@ -62,6 +63,14 @@
   function longLabel(iso, weekday) {
     const { m, d } = parseISO(iso);
     return `${m}월 ${d}일 ${weekday}요일`;
+  }
+  const pad2 = (n) => String(n).padStart(2, '0');
+  function monthPrefix(y, m) {
+    return `${y}-${pad2(m)}`;
+  }
+  function addMonths(y, m, delta) {
+    const d = new Date(y, m - 1 + delta, 1);
+    return { y: d.getFullYear(), m: d.getMonth() + 1 };
   }
 
   /* ---------------- 유틸 ---------------- */
@@ -130,7 +139,7 @@
     renderUpdated();
 
     el.allBtn.setAttribute('aria-pressed', String(state.all));
-    el.allBtn.textContent = state.all ? '선택한 날만 보기' : '지난 식단 전체';
+    el.allBtn.textContent = state.all ? '달력 닫기' : '지난 식단 전체';
     el.searchClear.hidden = !state.query;
   }
 
@@ -228,7 +237,7 @@
     }
 
     if (state.all) {
-      el.content.innerHTML = state.data.days.map((day) => dayGroup(day, mealsOf(day))).join('');
+      el.content.innerHTML = calendarHTML();
       return;
     }
 
@@ -238,6 +247,110 @@
       return;
     }
     el.content.innerHTML = dayGroup(day, mealsOf(day), false);
+  }
+
+  /* ---------------- 달력 (지난 식단 전체) ---------------- */
+  function calendarHTML() {
+    if (!state.month) {
+      const base = state.selected ? parseISO(state.selected) : parseISO(todayISO());
+      state.month = { y: base.y, m: base.m };
+    }
+    const { y, m } = state.month;
+    const prefix = monthPrefix(y, m) + '-';
+    const byDate = new Map(state.data.days.map((day) => [day.date, day]));
+    const today = todayISO();
+    const startDow = new Date(y, m - 1, 1).getDay();
+    const daysInMonth = new Date(y, m, 0).getDate();
+
+    const dows = DOW.map((label, i) =>
+      `<span class="${i === 0 ? 'is-sun' : (i === 6 ? 'is-sat' : '')}">${label}</span>`).join('');
+
+    let cells = '';
+    for (let i = 0; i < startDow; i++) cells += '<div class="cal__cell cal__cell--blank" aria-hidden="true"></div>';
+    for (let d = 1; d <= daysInMonth; d++) {
+      const iso = prefix + pad2(d);
+      const day = byDate.get(iso);
+      const dow = (startDow + d - 1) % 7;
+      const cls = ['cal__cell'];
+      if (dow === 0) cls.push('is-sun');
+      if (dow === 6) cls.push('is-sat');
+      cls.push(day ? 'cal__cell--has' : 'cal__cell--off');
+      if (iso === today) cls.push('is-today');
+      if (iso === state.selected) cls.push('is-selected');
+
+      const meals = day ? mealsOf(day) : [];
+      const dots = meals.map((meal) =>
+        `<i class="dot dot--${meal.slot.startsWith('breakfast') ? 'am' : 'pm'}"></i>`).join('');
+      const label = `${m}월 ${d}일 ${DOW[dow]}요일` +
+        (day ? `, ${meals.length}개 식단` : ', 기록된 식단 없음') +
+        (iso === today ? ' (오늘)' : '');
+
+      cells += `<button class="${cls.join(' ')}" type="button" data-caldate="${iso}"
+        aria-label="${esc(label)}" ${iso === state.selected ? 'aria-current="true"' : ''}
+        ${day ? '' : 'disabled'}>
+        <span class="cal__num">${d}</span>
+        <span class="cal__dots" aria-hidden="true">${dots}</span>
+      </button>`;
+    }
+    const rem = (startDow + daysInMonth) % 7;
+    if (rem) {
+      for (let i = 0; i < 7 - rem; i++) cells += '<div class="cal__cell cal__cell--blank" aria-hidden="true"></div>';
+    }
+
+    const selectedDay = state.selected && state.selected.startsWith(prefix)
+      ? byDate.get(state.selected) : null;
+    let panel;
+    if (selectedDay) {
+      panel = dayGroup(selectedDay, mealsOf(selectedDay));
+    } else if (state.data.days.some((day) => day.date.startsWith(prefix))) {
+      panel = `<div class="empty"><strong>날짜를 골라 주세요</strong>식단이 있는 날은 색으로 표시돼요.</div>`;
+    } else {
+      panel = `<div class="empty"><strong>${y}년 ${m}월에는 기록된 식단이 없어요</strong>
+        식단이 쌓이면 이 달력에 표시돼요.</div>`;
+    }
+
+    return `<div class="calendar">
+      <div class="cal__head">
+        <button class="cal__nav" type="button" data-month="-1" aria-label="이전 달">‹</button>
+        <p class="cal__title" aria-live="polite">${y}년 ${m}월</p>
+        <button class="cal__nav" type="button" data-month="1" aria-label="다음 달">›</button>
+      </div>
+      <div class="cal__dow" aria-hidden="true">${dows}</div>
+      <div class="cal__grid">${cells}</div>
+      <p class="cal__legend">
+        <span><i class="dot dot--am"></i>아침</span>
+        <span><i class="dot dot--pm"></i>저녁</span>
+        <span>날짜를 누르면 식단이 보여요</span>
+      </p>
+    </div>
+    <div class="calday" id="calDay">${panel}</div>`;
+  }
+
+  function shiftMonth(delta) {
+    if (!state.month) return;
+    const next = addMonths(state.month.y, state.month.m, delta);
+    state.month = next;
+    const prefix = monthPrefix(next.y, next.m) + '-';
+    if (!(state.selected && state.selected.startsWith(prefix))) {
+      const inMonth = state.data.days.filter((day) => day.date.startsWith(prefix));
+      if (inMonth.length) state.selected = inMonth[0].date; // days는 최신순 정렬
+    }
+    render();
+    const head = el.content.querySelector('.calendar');
+    if (head) head.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function selectCalDate(iso) {
+    state.selected = iso;
+    render();
+  }
+
+  function revealCalDay() {
+    const node = el.content.querySelector('.calday');
+    if (!node) return;
+    if (node.getBoundingClientRect().top > window.innerHeight - 140) {
+      node.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }
 
   function renderUpdated() {
@@ -376,6 +489,16 @@
   });
 
   el.content.addEventListener('click', (e) => {
+    const nav = e.target.closest('[data-month]');
+    if (nav) { shiftMonth(Number(nav.getAttribute('data-month'))); return; }
+
+    const cell = e.target.closest('[data-caldate]');
+    if (cell && !cell.disabled) {
+      selectCalDate(cell.getAttribute('data-caldate'));
+      revealCalDay();
+      return;
+    }
+
     const btn = e.target.closest('[data-meal]');
     if (!btn) return;
     openMeal(btn.getAttribute('data-meal'));
@@ -387,6 +510,9 @@
       state.query = '';
       el.search.value = '';
       el.allBtn.disabled = false;
+      // 열 때는 지금 보고 있던 날짜(없으면 오늘)가 속한 달부터 보여 준다.
+      const base = state.selected ? parseISO(state.selected) : parseISO(todayISO());
+      state.month = { y: base.y, m: base.m };
     }
     render();
   });

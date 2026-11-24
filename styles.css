@@ -186,6 +186,111 @@ body {
 .chipbtn:disabled { opacity: .4; cursor: default; }
 .updated { font-size: 12px; color: var(--sub); }
 
+/* ---------- 달력 (지난 식단 전체) ---------- */
+.calendar {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 12px 10px 12px;
+  box-shadow: var(--shadow-sm);
+}
+
+.cal__head {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 2px 4px 8px;
+}
+.cal__title { margin: 0; font-size: 17px; font-weight: 800; letter-spacing: -0.02em; }
+.cal__nav {
+  flex: none;
+  width: 36px; height: 36px;
+  display: grid; place-items: center;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--cream);
+  color: var(--ink-soft);
+  font: inherit;
+  font-size: 19px;
+  line-height: 1;
+  cursor: pointer;
+}
+.cal__nav:active { background: var(--cream-deep); }
+
+.cal__dow {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  padding: 2px 0 8px;
+  margin-bottom: 8px;
+  border-bottom: 1px dashed var(--line);
+}
+.cal__dow span { text-align: center; font-size: 11px; font-weight: 800; color: var(--sub); }
+.cal__dow .is-sun { color: #D98A6E; }
+.cal__dow .is-sat { color: #7BA3C7; }
+
+.cal__grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+
+.cal__cell {
+  position: relative;
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+  gap: 4px;
+  min-width: 0;
+  min-height: 52px;
+  padding: 5px 0 6px;
+  border: 1.5px solid transparent;
+  border-radius: 13px;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  cursor: default;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.cal__cell--blank { pointer-events: none; }
+.cal__cell--has { background: #FFF4E9; cursor: pointer; }
+.cal__cell--has:active { background: var(--brand-soft); }
+.cal__cell--off .cal__num { color: #D3C0B1; font-weight: 600; }
+.cal__cell.is-sun.cal__cell--has:not(.is-today) .cal__num { color: #C9603F; }
+.cal__cell.is-sat.cal__cell--has:not(.is-today) .cal__num { color: #4C88B8; }
+.cal__cell.is-selected {
+  background: var(--brand-soft);
+  border-color: #F2B79B;
+  box-shadow: 0 2px 8px rgba(228, 105, 63, .13);
+}
+
+.cal__num {
+  width: 26px; height: 26px;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  font-size: 13.5px;
+  font-weight: 700;
+  line-height: 1;
+}
+.cal__cell.is-today .cal__num {
+  background: var(--brand);
+  color: #fff;
+  font-weight: 800;
+  box-shadow: 0 2px 6px rgba(228, 105, 63, .34);
+}
+
+.cal__dots { display: flex; align-items: center; justify-content: center; gap: 2px; height: 4px; }
+.dot { display: inline-block; width: 4px; height: 4px; border-radius: 50%; }
+.dot--am { background: var(--gold); }
+.dot--pm { background: var(--brand); }
+.cal__cell.is-today .dot--pm { background: var(--brand-dark); }
+
+.cal__legend {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+  gap: 4px 12px;
+  margin: 10px 0 0;
+  font-size: 11.5px;
+  color: var(--sub);
+}
+.cal__legend span { display: inline-flex; align-items: center; gap: 5px; }
+
+.calday { margin-top: 16px; scroll-margin-top: 96px; }
+.calday .daygroup__head { margin-top: 0; }
+
 /* ---------- 식단 카드 ---------- */
 .content { display: grid; gap: 12px; }
 
@@ -463,6 +568,14 @@ body {
 .src__go { color: #B9A79A; font-size: 16px; }
 
 .detail__note { margin: 8px 2px 0; font-size: 12.5px; color: var(--sub); }
+
+@media (max-width: 360px) {
+  .calendar { padding: 10px 8px; }
+  .cal__grid { gap: 3px; }
+  .cal__num { width: 24px; height: 24px; font-size: 13px; }
+  .cal__cell { min-height: 48px; }
+  .cal__cell--has { background: #FFF4E9; }
+}
 
 @media (min-width: 560px) {
   .sheet { align-items: center; }
