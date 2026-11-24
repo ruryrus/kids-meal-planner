@@ -20,6 +20,8 @@
     search: document.getElementById('searchInput'),
     searchClear: document.getElementById('searchClear'),
     installBtn: document.getElementById('installBtn'),
+    installHint: document.getElementById('installHint'),
+    installHintClose: document.getElementById('installHintClose'),
     sheet: document.getElementById('sheet'),
     sheetCrumb: document.getElementById('sheetCrumb'),
     sheetTitle: document.getElementById('sheetTitle'),
@@ -37,10 +39,10 @@
 
   /* ---------------- 저장소 ---------------- */
   function loadChecks() {
-    try { return JSON.parse(localStorage.getItem(CHECK_KEY)) || {}; } catch { return {}; }
+    try { return JSON.parse(localStorage.getItem(CHECK_KEY)) || {}; } catch (e) { return {}; }
   }
   function saveChecks() {
-    try { localStorage.setItem(CHECK_KEY, JSON.stringify(state.checks)); } catch { /* private mode */ }
+    try { localStorage.setItem(CHECK_KEY, JSON.stringify(state.checks)); } catch (e) { /* private mode */ }
   }
 
   /* ---------------- 날짜 ---------------- */
@@ -97,12 +99,12 @@
       const res = await fetch(DATA_URL + '?t=' + Date.now(), { cache: 'no-store' });
       if (!res.ok) throw new Error('HTTP ' + res.status);
       data = await res.json();
-      try { localStorage.setItem(CACHE_KEY, JSON.stringify(data)); } catch { /* quota */ }
+      try { localStorage.setItem(CACHE_KEY, JSON.stringify(data)); } catch (e) { /* quota */ }
       state.offline = false;
     } catch (err) {
       const cached = localStorage.getItem(CACHE_KEY);
       if (cached) {
-        try { data = JSON.parse(cached); state.offline = true; } catch { data = null; }
+        try { data = JSON.parse(cached); state.offline = true; } catch (e) { data = null; }
       }
       if (!data) {
         el.content.innerHTML = `<div class="empty"><strong>식단을 불러오지 못했어요</strong>
@@ -137,7 +139,9 @@
     if (!day) return;
     const isToday = day.date === todayISO();
     el.heroBadge.textContent = isToday ? '오늘' : '지난 식단';
-    el.heroMeta.textContent = isToday ? '오늘의 아이들 식단' : '지난 식단 다시 보기';
+    el.heroMeta.textContent = isToday
+      ? '오늘의 아이들 식단'
+      : (day === state.data.days[0] ? '오늘 식단은 아침 7:51에 올라와요' : '지난 식단 다시 보기');
     el.heroDate.textContent = longLabel(day.date, day.weekday);
     el.heroNote.textContent = day.note || '';
   }
@@ -325,8 +329,9 @@
   }
 
   function updateIngCount(mealId) {
-    const meal = findMeal(mealId)?.meal;
-    if (!meal) return;
+    const found = findMeal(mealId);
+    if (!found) return;
+    const meal = found.meal;
     const checked = state.checks[mealId] || [];
     const node = document.getElementById('ingCount');
     if (node) node.textContent = `장보기 ${checked.length} / ${meal.ingredients.length}`;
@@ -354,6 +359,7 @@
     state.all = false;
     state.query = '';
     el.search.value = '';
+    el.allBtn.disabled = false;
     render();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
@@ -369,6 +375,7 @@
     if (state.all) {
       state.query = '';
       el.search.value = '';
+      el.allBtn.disabled = false;
     }
     render();
   });
@@ -433,11 +440,23 @@
     try {
       const choice = await installEvent.userChoice;
       if (choice && choice.outcome === 'accepted') el.installBtn.hidden = true;
-    } catch { /* ignore */ }
+    } catch (e) { /* ignore */ }
     installEvent = null;
   });
 
   window.addEventListener('appinstalled', () => { el.installBtn.hidden = true; });
+
+  /* 홈 화면 추가 안내(설치 배너를 지원하지 않는 환경에서도 보이도록) */
+  const HINT_KEY = 'mealplan.installHintDismissed';
+  function updateHint() {
+    const dismissed = localStorage.getItem(HINT_KEY) === '1';
+    el.installHint.hidden = standalone || dismissed;
+  }
+  el.installHintClose.addEventListener('click', () => {
+    try { localStorage.setItem(HINT_KEY, '1'); } catch (e) { /* private mode */ }
+    updateHint();
+  });
+  updateHint();
 
   /* ---------------- 서비스 워커 ---------------- */
   if ('serviceWorker' in navigator) {

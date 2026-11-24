@@ -4,6 +4,7 @@
   "description": "아이들과 함께 먹는 아침·저녁 식단과 레시피를 날짜별로 쌓아 두는 식단표",
   "lang": "ko",
   "dir": "ltr",
+  "id": "./",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

@@ -183,6 +183,7 @@ body {
   cursor: pointer;
 }
 .chipbtn[aria-pressed="true"] { background: var(--brand-soft); border-style: solid; border-color: #F5BFA6; color: var(--brand-dark); }
+.chipbtn:disabled { opacity: .4; cursor: default; }
 .updated { font-size: 12px; color: var(--sub); }
 
 /* ---------- 식단 카드 ---------- */
@@ -223,7 +224,7 @@ body {
 }
 .meal--breakfast .meal__emoji { background: var(--gold-soft); }
 .meal--dinner .meal__emoji { background: var(--brand-soft); }
-.meal__body { flex: 1; min-width: 0; }
+.meal__body { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; }
 .meal__slot {
   display: inline-block;
   font-size: 11px; font-weight: 800; letter-spacing: .04em;
@@ -277,6 +278,24 @@ body {
 .skeleton { display: grid; gap: 12px; }
 .sk { height: 88px; border-radius: var(--radius); background: linear-gradient(100deg, #FBEEE2 30%, #FFF6ED 50%, #FBEEE2 70%); background-size: 220% 100%; animation: shimmer 1.3s infinite linear; }
 @keyframes shimmer { from { background-position: 130% 0; } to { background-position: -30% 0; } }
+
+/* 홈 화면 추가 안내 */
+.installhint {
+  position: relative;
+  margin-top: 20px;
+  padding: 14px 40px 14px 15px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+}
+.installhint__title { margin: 0 0 3px; font-size: 14px; font-weight: 800; }
+.installhint__body { margin: 0; font-size: 13px; color: var(--sub); line-height: 1.55; }
+.installhint__body b { color: var(--brand-dark); }
+.installhint__close {
+  position: absolute; top: 8px; right: 8px;
+  border: 0; background: transparent; color: #C0AC9E;
+  font-size: 13px; padding: 6px; cursor: pointer; line-height: 1;
+}
 
 .footnote { text-align: center; font-size: 12px; color: #B7A396; margin: 26px 0 6px; }
 
