@@ -160,12 +160,20 @@
   function mealCard(day, meal) {
     const q = state.query;
     const kind = meal.slot.startsWith('breakfast') ? 'breakfast' : 'dinner';
+    // 제목·소개에는 없고 재료에서만 걸린 경우, 어떤 재료로 찾았는지 한 줄 보여 준다.
+    let ingHint = '';
+    if (q) {
+      const inTitle = (meal.name + ' ' + meal.summary + ' ' + meal.tags.join(' ')).toLowerCase().includes(q.toLowerCase());
+      const hit = (meal.ingredients || []).find((i) => i.name.toLowerCase().includes(q.toLowerCase()));
+      if (!inTitle && hit) ingHint = `<span class="meal__hit">재료 · ${highlight(hit.name, q)}</span>`;
+    }
     return `<button class="meal meal--${kind}" type="button" data-meal="${meal.id}">
       <span class="meal__emoji" aria-hidden="true">${meal.emoji || '🍽'}</span>
       <span class="meal__body">
         <span class="meal__slot">${esc(meal.slotLabel)}</span>
         <span class="meal__name">${highlight(meal.name, q)}</span>
         <span class="meal__sub">${highlight(meal.summary, q)}</span>
+        ${ingHint}
         <span class="meal__tags">${meal.tags.map((t, i) =>
           `<span class="tag ${tagClass(i)}">${highlight(t, q)}</span>`).join('')}</span>
         <span class="meal__foot">
@@ -315,7 +323,9 @@
       ${meal.kidTip ? `<h4>🧒 아이용 팁</h4><div class="tip">${esc(meal.kidTip)}</div>` : ''}
 
       ${srcs ? `<h4>🔗 레시피 출처</h4><div class="srcs">${srcs}</div>` : ''}
-      <p class="detail__note">출처의 ‘참고’는 같은 메뉴를 공개 레시피로 확인한 링크예요. 집에 있는 재료에 맞춰 양을 조절해 주세요.</p>
+      ${(meal.sources || []).some((s) => s.type === '참고')
+        ? '<p class="detail__note">출처의 ‘참고’는 같은 메뉴를 공개 레시피로 확인한 링크예요. 집에 있는 재료에 맞춰 양을 조절해 주세요.</p>'
+        : ''}
     </div>`;
   }
 
