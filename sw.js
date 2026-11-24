@@ -3,7 +3,7 @@
  * - data/menus.json: 네트워크 우선(최신 식단이 먼저) + 실패하면 캐시
  * 모든 경로는 상대경로라 https://<user>.github.io/<repo>/ 어디에 올려도 동작합니다.
  */
-const VERSION = 'v2';
+const VERSION = 'v3';
 const SHELL_CACHE = 'kids-meal-shell-' + VERSION;
 const DATA_CACHE = 'kids-meal-data-' + VERSION;
 
@@ -23,8 +23,15 @@ const DATA_URL = new URL('./data/menus.json', self.location.href).href;
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
+    // cache: 'reload' 로 설치 시점에 HTTP 캐시를 건너뛰고 진짜 최신 파일을 받아 둔다.
     caches.open(SHELL_CACHE)
-      .then((cache) => cache.addAll(SHELL_FILES))
+      .then((cache) => Promise.all(SHELL_FILES.map((file) =>
+        fetch(new Request(file, { cache: 'reload' }))
+          .then((res) => {
+            if (res && res.ok) return cache.put(file, res);
+            throw new Error('precache failed: ' + file);
+          })
+      )))
       .then(() => self.skipWaiting())
       .catch(() => self.skipWaiting())
   );
