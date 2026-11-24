@@ -8,17 +8,23 @@
 
 ## 매일 식단 추가하는 방법 (브리핑에서 하루 1회)
 
-1. `data/menus.json`의 `days` 배열 **맨 뒤에 오늘 날짜 블록을 추가**합니다.
-2. `app.updatedAt`을 현재 시각으로 바꿉니다.
-3. 커밋 & 푸시하면 몇 초 뒤 앱에 반영됩니다. (앱은 열 때마다 `menus.json`을 네트워크에서 먼저 받아옵니다.)
+### 방법 A — 도우미 스크립트 (권장)
+
+1. 그날 식단 4개를 담은 JSON 파일(day 객체 하나)을 만듭니다.
+2. `python3 tools/add_day.py <day.json>` — 날짜·slot·id·필수 항목을 검사하고, 중복 날짜는 거부하며, `app.updatedAt`까지 갱신합니다.
+3. 커밋 & 푸시하면 몇 초 뒤 앱에 반영됩니다.
 
 ```bash
 cd <로컬 저장소 경로>
-# data/menus.json 수정 후
-git add data/menus.json
-git commit -m "식단 추가: 2026-11-25 (수)"
-git push
+python3 tools/add_day.py /tmp/day.json
+git add data/menus.json && git commit -m "식단 추가: 2026-11-25 (수)" && git push
 ```
+
+### 방법 B — 직접 편집
+
+1. `data/menus.json`의 `days` 배열 **맨 뒤에 오늘 날짜 블록을 추가**합니다.
+2. `app.updatedAt`을 현재 시각으로 바꿉니다.
+3. 커밋 & 푸시하면 몇 초 뒤 앱에 반영됩니다. (앱은 열 때마다 `menus.json`을 네트워크에서 먼저 받아옵니다.)
 
 ## `data/menus.json` 스키마
 
@@ -93,6 +99,7 @@ manifest.webmanifest  PWA 설정(standalone, 아이콘)
 sw.js                 서비스 워커: 최신 데이터 우선 + 오프라인 캐시
 icons/                앱 아이콘 (tools/make_icons.py로 생성)
 tools/make_icons.py   아이콘 생성 스크립트 (Pillow)
+tools/add_day.py      하루치 식단을 검사하며 menus.json에 추가하는 스크립트
 ```
 
 ## 캐시 갱신
