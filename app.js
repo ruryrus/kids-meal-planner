@@ -177,12 +177,13 @@
     </button>`;
   }
 
-  function dayGroup(day, meals) {
-    return `<div class="daygroup">
-      <div class="daygroup__head">
+  function dayGroup(day, meals, showHead = true) {
+    const head = showHead ? `<div class="daygroup__head">
         <span class="daygroup__date">${longLabel(day.date, day.weekday)}</span>
         ${day.note ? `<span class="daygroup__note">${esc(day.note)}</span>` : ''}
-      </div>
+      </div>` : '';
+    return `<div class="daygroup">
+      ${head}
       ${meals.map((m) => mealCard(day, m)).join('')}
     </div>`;
   }
@@ -228,7 +229,7 @@
       el.content.innerHTML = `<div class="empty"><strong>아직 식단이 없어요</strong>내일 아침 브리핑부터 채워집니다.</div>`;
       return;
     }
-    el.content.innerHTML = dayGroup(day, mealsOf(day));
+    el.content.innerHTML = dayGroup(day, mealsOf(day), false);
   }
 
   function renderUpdated() {
