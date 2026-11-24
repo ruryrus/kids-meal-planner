@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>모바일 폭 확인 (임시)</title>
+<style>
+  html, body { margin: 0; background: #f2ece5; font-family: sans-serif; }
+  .frame { width: 390px; margin: 0 auto; background: #fff; box-shadow: 0 0 0 1px #ddd; }
+  .bar { width: 390px; margin: 0 auto; font-size: 12px; color: #888; padding: 6px 4px; }
+  iframe { display: block; width: 390px; border: 0; }
+</style>
+</head>
+<body>
+<p class="bar">390px 폭 확인용 임시 페이지</p>
+<div class="frame"><iframe id="app" src="../" title="아이들 식단표 모바일 미리보기"></iframe></div>
+<script>
+  const f = document.getElementById('app');
+  f.addEventListener('load', () => {
+    const h = f.contentDocument.documentElement.scrollHeight;
+    f.style.height = Math.max(h, 844) + 'px';
+  });
+</script>
+</body>
+</html>
